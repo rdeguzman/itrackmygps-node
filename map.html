@@ -10,7 +10,9 @@
   <div id="messages"></div>
 
   <script language="JavaScript">
-    var socket = io.connect('http://192.168.0.17:8080');
+    var host = "192.168.0.17";
+    var port = 8080;
+    var socket = io.connect('http://' + host + ':' + port);
 
     socket.on('message', function(d){
       var parsedObj = JSON.parse(d);
