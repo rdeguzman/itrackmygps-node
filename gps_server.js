@@ -1,8 +1,11 @@
-var http = require('http'),
-    qs = require('querystring'),
-    pg = require('pg');
+var http = require('http');
+var qs = require('querystring');
+var pg = require('pg');
 
 var connectionString = "postgres://rupert@localhost/gpslogger_development";
+
+var gps_server = http.createServer(handle_incoming_request);
+gps_server.listen(8081);
 
 function handle_incoming_request(req, res){
   console.log("Incoming request: (" + req.method + ") " + req.url);
@@ -73,7 +76,8 @@ function insertLocation(loc){
           console.error('error inserting ', err);
         }
         else{
-          console.log(result);
+//          console.log('Inserted' + result);
+          console.log('Inserted');
         }
 
       });
@@ -82,7 +86,3 @@ function insertLocation(loc){
     }
   });
 }
-
-
-var s = http.createServer(handle_incoming_request);
-s.listen(8080);
