@@ -7,6 +7,8 @@ var fs = require('fs');
 var pg = require('pg');
 var port = 8080;
 
+var map_clients = [];
+
 var connectionString = "postgres://rupert@localhost/gpslogger_development";
 
 var route = {
@@ -34,6 +36,13 @@ route.for("POST", "/location", function(request, response){
 
     var obj = qs.parse(form_data);
     insertLocation(obj);
+    console.log("Connected clients:" + map_clients.length);
+
+    for(var i=0; i < map_clients.length; i++){
+      var client = map_clients[i];
+      console.log("Sending gps to map_client");
+      client.send(JSON.stringify({ type:'serverMessage', message:'GPS received from server'}));
+    }
 
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("OK");
@@ -91,6 +100,20 @@ server.listen(port);
 console.log("Server " + port + " has started.");
 
 io = io.listen(server);
-io.sockets.on("connection", function(socket){
-  console.log("User is connected");
-})
+
+io.sockets.on("connection", function(client){
+  console.log("Pushing client to map_clients[]");
+  map_clients.push(client);
+
+  client.send(JSON.stringify({
+    type:'serverMessage',
+    message:'Hello from Server'
+  }));
+
+  client.on('disconnect', function(){
+    map_clients.splice(map_clients.indexOf(client), 1);
+  })
+
+});
+
+
