@@ -14,8 +14,10 @@ You will need:
 ## Installation (gps_server)
 
 - Clone the project from `git clone https://github.com/rdeguzman/gpslogger-node.git`
-- Install pg from npm: `npm install pg`
+- Install `pg` from npm: `npm install pg`
 - Change postgres settings in `gps_server.js`
 - Start the gps_server: `node server/gps_server.js`
 
 ## Installation (viewer)
+
+- Install `socket.io` from npm: `npm install socket.io`
