@@ -15,12 +15,12 @@
 <body>
   <div id="mapdiv"></div>
 
-  <div id="messages">GPS</div>
+  <div id="messages">
+    GPS<br/>
+  </div>
 
   <script language="JavaScript">
-    var map;
-    var marker;
-
+    var map, marker, socket;
 
     function initMap(){
       var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
@@ -54,27 +54,31 @@
       return new google.maps.LatLng(lat, lon);
     }
 
-    var host = "192.168.0.17";
-    var port = 8080;
-    var socket = io.connect('http://' + host + ':' + port);
+    function initSocket(){
+      var host = "192.168.0.17";
+      var port = 8080;
 
-    socket.on('message', function(d){
-      var parsedObj = JSON.parse(d);
-      if(parsedObj.type === 'gps'){
-        var gps = parsedObj.data;
-        $('#messages').append('<p>'+ gps.gps_latitude + ',' + gps.gps_longitude + '</p>');
+      socket = io.connect('http://' + host + ':' + port);
 
-        if(marker == null){
-          createMarker(gps);
+      socket.on('message', function(d){
+        var parsedObj = JSON.parse(d);
+        if(parsedObj.type === 'gps'){
+          var gps = parsedObj.data;
+          $('#messages').append(gps.gps_latitude + ',' + gps.gps_longitude + '<br/>');
+
+          if(marker == null){
+            createMarker(gps);
+          }
+          else{
+            moveMarker(gps);
+          }
         }
-        else{
-          moveMarker(gps);
-        }
-      }
-    });
+      });
+    }
 
     $(document).ready(function(){
       initMap();
+      initSocket();
     });
   </script>
 
