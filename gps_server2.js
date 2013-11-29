@@ -1,8 +1,11 @@
 var http = require('http');
 var url = require('url');
 var qs = require('querystring');
-var port = 8080;
+var io = require('socket.io');
+var fs = require('fs');
+
 var pg = require('pg');
+var port = 8080;
 
 var connectionString = "postgres://rupert@localhost/gpslogger_development";
 
@@ -14,9 +17,10 @@ var route = {
 }
 
 route.for("GET", "/map", function(request, response){
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  response.write("map");
-  response.end();
+  fs.readFile('./map.html', function(error, data){
+    response.writeHead(200, {"Content-Type": "text/html"});
+    response.end(data, 'utf-8');
+  })
 });
 
 route.for("POST", "/location", function(request, response){
@@ -82,5 +86,11 @@ function insertLocation(loc){
   });
 }
 
-http.createServer(onRequest).listen(port);
+var server = http.createServer(onRequest);
+server.listen(port);
 console.log("Server " + port + " has started.");
+
+io = io.listen(server);
+io.sockets.on("connection", function(socket){
+  console.log("User is connected");
+})
