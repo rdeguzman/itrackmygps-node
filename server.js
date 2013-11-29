@@ -106,7 +106,7 @@ io.sockets.on("connection", function(client){
   // We push the map clients to an array.
   // If a gps is received from a device,
   // we broadcast the gps to all map clients.
-  console.log("Pushing client to map_clients[]");
+  console.log("Map client connected");
   map_clients.push(client);
 
   client.on('disconnect', function(){
