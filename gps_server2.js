@@ -36,12 +36,12 @@ route.for("POST", "/location", function(request, response){
 
     var obj = qs.parse(form_data);
     insertLocation(obj);
-    console.log("Connected clients:" + map_clients.length);
+    console.log("Connected clients: " + map_clients.length);
 
     for(var i=0; i < map_clients.length; i++){
       var client = map_clients[i];
-      console.log("Sending gps to map_client");
-      client.send(JSON.stringify({ type:'serverMessage', message:'GPS received from server'}));
+      var jsonString = JSON.stringify({ type:'gps', data:obj});
+      client.send(jsonString);
     }
 
     response.writeHead(200, {"Content-Type": "text/plain"});
@@ -102,13 +102,12 @@ console.log("Server " + port + " has started.");
 io = io.listen(server);
 
 io.sockets.on("connection", function(client){
+
+  // We push the map clients to an array.
+  // If a gps is received from a device,
+  // we broadcast the gps to all map clients.
   console.log("Pushing client to map_clients[]");
   map_clients.push(client);
-
-  client.send(JSON.stringify({
-    type:'serverMessage',
-    message:'Hello from Server'
-  }));
 
   client.on('disconnect', function(){
     map_clients.splice(map_clients.indexOf(client), 1);
