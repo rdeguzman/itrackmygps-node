@@ -8,8 +8,8 @@
   <style type="text/css">
     html{ height: 100% }
     body{ height: 100%; margin:0; padding: 0;}
-    #mapdiv{ width: 50%; height: 100%; float:left; }
-    #messages{ width: 50%; float: left;}
+    #mapdiv{ width: 70%; height: 100%; float:left; }
+    #messages{ width: 30%; float: left;}
   </style>
 </head>
 <body>
@@ -23,7 +23,8 @@
     var map, marker, socket;
 
     function initMap(){
-      var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
+      //var myLatlng = new google.maps.LatLng(-25.363882,131.044922); //Australia
+      var myLatlng = new google.maps.LatLng(0,0);
 
       var mapOptions = {
         center: myLatlng,
