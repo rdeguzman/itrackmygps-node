@@ -8,8 +8,8 @@
   <style type="text/css">
     html{ height: 100% }
     body{ height: 100%; margin:0; padding: 0;}
-    #mapdiv{ width: 70%; height: 100%; float:left; }
-    #messages{ width: 30%; float: left;}
+    #mapdiv{ width: 60%; height: 100%; float:left; }
+    #messages{ width: 40%; float: left; font-size: x-small;}
   </style>
 </head>
 <body>
@@ -28,7 +28,7 @@
 
       var mapOptions = {
         center: myLatlng,
-        zoom: 4
+        zoom: 10
       };
 
       map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
@@ -55,6 +55,13 @@
       return new google.maps.LatLng(lat, lon);
     }
 
+    function formatGPSHTMLOutput(gps){
+      var s = gps.gps_timestamp + ' ';
+      s += '(' + gps.gps_latitude + ',' + gps.gps_longitude + ')';
+      s += '<br/>';
+      return s;
+    }
+
     function initSocket(){
       var host = "192.168.0.17";
       var port = 8080;
@@ -65,7 +72,7 @@
         var parsedObj = JSON.parse(d);
         if(parsedObj.type === 'gps'){
           var gps = parsedObj.data;
-          $('#messages').append(gps.gps_latitude + ',' + gps.gps_longitude + '<br/>');
+          $('#messages').append(formatGPSHTMLOutput(gps));
 
           if(marker == null){
             createMarker(gps);
