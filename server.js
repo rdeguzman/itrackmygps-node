@@ -69,16 +69,17 @@ function insertLocation(loc){
       console.error('error fetching client from pool ', err);
     }
     else{
-      var sqlStmt  = "INSERT INTO locations(gps_timestamp,";
+      var sqlStmt  = "INSERT INTO locations(";
+          sqlStmt += "device_id,";
+          sqlStmt += "gps_timestamp,";
           sqlStmt += "gps_latitude,";
           sqlStmt += "gps_longitude,";
           sqlStmt += "gps_speed,";
           sqlStmt += "gps_heading,";
-          sqlStmt += "created_at,";
-          sqlStmt += "updated_at)";
-          sqlStmt += "VALUES ($1, $2, $3, $4, $5, Now(), Now())";
+          sqlStmt += "created_at)";
+          sqlStmt += "VALUES ($1, $2, $3, $4, $5, $6, Now())";
 
-      var sqlParams = [loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading];
+      var sqlParams = [loc.device_id, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading];
 
       var query = client.query(sqlStmt, sqlParams, function(err, result){
         if(err){
