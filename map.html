@@ -20,8 +20,8 @@
   </div>
 
   <script language="JavaScript">
-    var map, socket;
-    var devices = [], marker;
+    var map, devices_bounds, socket;
+    var devices = [];
 
     function initMap(){
       //var myLatlng = new google.maps.LatLng(-25.363882,131.044922); //Australia
@@ -33,6 +33,7 @@
       };
 
       map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
+      devices_bounds = new google.maps.LatLngBounds();
     }
 
     function getDevice(device_id, markers){
@@ -57,6 +58,8 @@
       else{
         moveDevice(device, gps);
       }
+
+      map.fitBounds(devices_bounds);
     }
 
     function createDevice(gps){
@@ -67,12 +70,15 @@
       });
 
       marker.set("device_id", gps.device_id);
+      devices_bounds.extend(pos);
+
       return marker;
     }
 
     function moveDevice(device, gps){
       var pos = getLatLngFromString(gps);
       device.setPosition(pos);
+      devices_bounds.extend(pos);
     }
 
     function getLatLngFromString(obj){
