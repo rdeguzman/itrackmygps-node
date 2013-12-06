@@ -89,10 +89,10 @@
     }
 
     function initSocket(){
-      var host = "track.geocoding.io";
-      var port = 8080;
+      var socket_host = "track.geocoding.io";
+      var socket_port = 8080;
 
-      socket = io.connect('http://' + host + ':' + port);
+      socket = io.connect('http://' + socket_host + ':' + socket_port);
 
       socket.on('message', function(d){
         var parsedObj = JSON.parse(d);
