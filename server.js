@@ -9,7 +9,9 @@ var port = 8080;
 
 var map_clients = [];
 
-var connectionString = "postgres://rupert@localhost/gpslogger_development";
+var PGUSER = process.env.PGUSER;
+var PGPASS = process.env.PGPASS;
+var connectionString = "postgres://" + PGUSER + ":" + PGPASS + "@localhost/gpslogger_development";
 
 var route = {
   routes : {},
