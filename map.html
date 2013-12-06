@@ -58,8 +58,6 @@
       else{
         moveDevice(device, gps);
       }
-
-      map.fitBounds(devices_bounds);
     }
 
     function createDevice(gps){
@@ -70,7 +68,7 @@
       });
 
       marker.set("device_id", gps.device_id);
-      devices_bounds.extend(pos);
+      adjustMapBounds(pos);
 
       return marker;
     }
@@ -78,7 +76,14 @@
     function moveDevice(device, gps){
       var pos = getLatLngFromString(gps);
       device.setPosition(pos);
-      devices_bounds.extend(pos);
+      adjustMapBounds(pos);
+    }
+
+    function adjustMapBounds(pos){
+      if(map.getBounds().contains(pos) == false){
+        devices_bounds.extend(pos);
+        map.fitBounds(devices_bounds);
+      }
     }
 
     function getLatLngFromString(obj){
