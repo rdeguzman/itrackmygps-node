@@ -56,7 +56,8 @@
     }
 
     function formatGPSHTMLOutput(gps){
-      var s = gps.gps_timestamp + ' ';
+      var s = gps.device_id + ' ';
+      s += gps.gps_timestamp + ' ';
       s += '(' + gps.gps_latitude + ',' + gps.gps_longitude + ')';
       s += '<br/>';
       return s;
