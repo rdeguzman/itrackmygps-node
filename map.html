@@ -20,7 +20,8 @@
   </div>
 
   <script language="JavaScript">
-    var map, marker, socket;
+    var map, socket;
+    var devices = [], marker;
 
     function initMap(){
       //var myLatlng = new google.maps.LatLng(-25.363882,131.044922); //Australia
@@ -34,20 +35,44 @@
       map = new google.maps.Map(document.getElementById('mapdiv'), mapOptions);
     }
 
-    function createMarker(gps){
+    function getDevice(device_id, markers){
+      var device = null;
+
+      for(var i = 0; i < markers.length; i++){
+        if(markers[i].device_id === device_id){
+          device = markers[i];
+          break;
+        }
+      }
+
+      return device;
+    }
+
+    function processGPS(gps){
+      var device = getDevice(gps.device_id, devices);
+      if(device == null){
+        device = createDevice(gps);
+        devices.push(device);
+      }
+      else{
+        moveDevice(device, gps);
+      }
+    }
+
+    function createDevice(gps){
       var pos = getLatLngFromString(gps);
-      marker = new google.maps.Marker({
+      var marker = new google.maps.Marker({
         position: pos,
         map: map
       });
 
-      map.setCenter(pos);
+      marker.set("device_id", gps.device_id);
+      return marker;
     }
 
-    function moveMarker(gps){
+    function moveDevice(device, gps){
       var pos = getLatLngFromString(gps);
-      marker.setPosition(pos);
-      map.setCenter(pos);
+      device.setPosition(pos);
     }
 
     function getLatLngFromString(obj){
@@ -74,13 +99,7 @@
         if(parsedObj.type === 'gps'){
           var gps = parsedObj.data;
           $('#messages').append(formatGPSHTMLOutput(gps));
-
-          if(marker == null){
-            createMarker(gps);
-          }
-          else{
-            moveMarker(gps);
-          }
+          processGPS(gps);
         }
       });
     }
