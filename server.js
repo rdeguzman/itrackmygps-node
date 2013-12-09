@@ -27,12 +27,6 @@ route.for("GET", "/map", function(request, response){
   })
 });
 
-route.for("GET", "/devices", function(request, response){
-  fetchDevices();
-  response.writeHead(200, {"Content-Type": "text/html"});
-  response.end('OK', 'utf-8');
-});
-
 route.for("POST", "/location", function(request, response){
   var form_data = "";
   request.on('data', function(chunk){
@@ -71,24 +65,32 @@ function onRequest(request, response){
   }
 }
 
-function fetchDevices(){
+route.for("GET", "/devices", function(request, response){
   var rows = [];
-  var client = new pg.Client(connectionString);
-  var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY device_id)";
-  var query = client.query(sqlStmt);
 
-  query.on('row', function(row, result){
-    result.addRow(row);
+  pg.connect(connectionString, function(err, client) {
+    if(err) {
+      console.error('error fetching client from pool ', err);
+    }
+    else{
+      var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY device_id)";
+
+      var query = client.query(sqlStmt);
+      query.on('row', function(row){
+        console.log(row.device_id + ' ' + row.gps_latitude + ' ' + row.gps_longitude);
+        rows.push(row);
+      });
+
+      query.on('end', function(result){
+        client.end();
+
+        response.writeHead(200, {"Content-Type": "text/html"});
+        response.end(JSON.stringify(rows), 'utf-8');
+      });
+    }
   });
+});
 
-  query.on('end', function(result){
-    rows = JSON.stringify(result.rows);
-    console.log(rows);
-    client.end();
-  });
-
-  return rows;
-}
 
 function insertLocation(loc){
   pg.connect(connectionString, function(err, client, done) {
