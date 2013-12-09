@@ -27,6 +27,12 @@ route.for("GET", "/map", function(request, response){
   })
 });
 
+route.for("GET", "/devices", function(request, response){
+  fetchDevices();
+  response.writeHead(200, {"Content-Type": "text/html"});
+  response.end('OK', 'utf-8');
+});
+
 route.for("POST", "/location", function(request, response){
   var form_data = "";
   request.on('data', function(chunk){
@@ -63,6 +69,23 @@ function onRequest(request, response){
     response.writeHead(404, {"Content-Type": "text/plain"});
     response.end("404 not found");
   }
+}
+
+function fetchDevices(){
+  var rows = []
+  pg.connect(connectionString, function(err, client, done) {
+    if(err) {
+      console.error('error fetching client from pool ', err);
+    }
+    else{
+      var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY device_id)";
+
+      var query = client.query(sqlStmt);
+      query.on('row', function(row){
+         console.log(row.device_id + ' ' + row.gps_latitude + ' ' + row.gps_longitude);
+      });
+    }
+  });
 }
 
 function insertLocation(loc){
