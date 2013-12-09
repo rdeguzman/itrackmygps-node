@@ -72,20 +72,22 @@ function onRequest(request, response){
 }
 
 function fetchDevices(){
-  var rows = []
-  pg.connect(connectionString, function(err, client, done) {
-    if(err) {
-      console.error('error fetching client from pool ', err);
-    }
-    else{
-      var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY device_id)";
+  var rows = [];
+  var client = new pg.Client(connectionString);
+  var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY device_id)";
+  var query = client.query(sqlStmt);
 
-      var query = client.query(sqlStmt);
-      query.on('row', function(row){
-         console.log(row.device_id + ' ' + row.gps_latitude + ' ' + row.gps_longitude);
-      });
-    }
+  query.on('row', function(row, result){
+    result.addRow(row);
   });
+
+  query.on('end', function(result){
+    rows = JSON.stringify(result.rows);
+    console.log(rows);
+    client.end();
+  });
+
+  return rows;
 }
 
 function insertLocation(loc){
