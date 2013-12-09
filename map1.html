@@ -117,8 +117,15 @@
       });
     }
 
+    function fetchLastknownLocations(){
+      $.get(socket_url + '/devices', function( data ) {
+        console.log(data);
+      });
+    }
+
     $(document).ready(function(){
       initMap();
+      fetchLastknownLocations();
       initSocket();
     });
   </script>
