@@ -84,7 +84,7 @@ route.for("GET", "/devices", function(request, response){
       query.on('end', function(result){
         client.end();
 
-        response.writeHead(200, {"Content-Type": "text/html"});
+        response.writeHead(200, {"Content-Type": "text/json"});
         response.end(JSON.stringify(rows), 'utf-8');
       });
     }
