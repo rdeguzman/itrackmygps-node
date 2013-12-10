@@ -23,6 +23,7 @@
     var socket_host = "track.geocoding.io";
     var socket_port = 8080;
     var socket_url  = 'http://' + socket_host + ':' + socket_port;
+    var http_url = 'http://' + socket_host;
     var socket;
 
     var map, devices_bounds;
@@ -103,7 +104,7 @@
     }
 
     function fetchLastknownDeviceLocations(){
-      $.get(socket_url + '/devices', function( data ) {
+      $.get(http_url + '/devices', function( data ) {
         for(var i=0;i < data.length;i++){
           var gps = data[i];
           if(gps.gps_latitude != 0 && gps.gps_longitude != 0){
