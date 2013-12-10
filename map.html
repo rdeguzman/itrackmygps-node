@@ -20,7 +20,12 @@
   </div>
 
   <script language="JavaScript">
-    var map, devices_bounds, socket;
+    var socket_host = "track.geocoding.io";
+    var socket_port = 8080;
+    var socket_url  = 'http://' + socket_host + ':' + socket_port;
+    var socket;
+
+    var map, devices_bounds;
     var devices = [];
 
     function initMap(){
@@ -80,10 +85,35 @@
     }
 
     function adjustMapBounds(pos){
-      if(map.getBounds().contains(pos) == false){
+      // need to wait for the tiles to load before we can get the map bounds
+      var currentBounds = map.getBounds();
+
+      if(typeof(currentBounds) != 'undefined' &&  currentBounds.contains(pos) == false){
         devices_bounds.extend(pos);
         map.fitBounds(devices_bounds);
       }
+    }
+
+    function fitAllDevicesOnMap(){
+      for(var i = 0; i < devices.length; i++){
+        var pos = devices[i].getPosition();
+        devices_bounds.extend(pos);
+        map.fitBounds(devices_bounds);
+      }
+    }
+
+    function fetchLastknownDeviceLocations(){
+      $.get(socket_url + '/devices', function( data ) {
+        for(var i=0;i < data.length;i++){
+          var gps = data[i];
+          if(gps.gps_latitude != 0 && gps.gps_longitude != 0){
+            device = createDevice(data[i]);
+            devices.push(device);
+          }
+        }
+
+        fitAllDevicesOnMap();
+      });
     }
 
     function getLatLngFromString(obj){
@@ -100,10 +130,7 @@
     }
 
     function initSocket(){
-      var socket_host = "track.geocoding.io";
-      var socket_port = 8080;
-
-      socket = io.connect('http://' + socket_host + ':' + socket_port);
+      socket = io.connect(socket_url);
 
       socket.on('message', function(d){
         var parsedObj = JSON.parse(d);
@@ -118,6 +145,7 @@
     $(document).ready(function(){
       initMap();
       initSocket();
+      fetchLastknownDeviceLocations();
     });
   </script>
 
