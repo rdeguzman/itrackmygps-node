@@ -11,7 +11,7 @@ var map_clients = [];
 
 var PGUSER = process.env.PGUSER;
 var PGPASS = process.env.PGPASS;
-var connectionString = "postgres://" + PGUSER + ":" + PGPASS + "@localhost/gpslogger_development";
+var connectionString = "postgres://" + PGUSER + ":" + PGPASS + "@localhost/gpslogger_production";
 
 var route = {
   routes : {},
