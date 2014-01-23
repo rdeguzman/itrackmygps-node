@@ -73,11 +73,11 @@ route.for("GET", "/devices", function(request, response){
       console.error('error fetching client from pool ', err);
     }
     else{
-      var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY device_id)";
+      var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY uuid)";
 
       var query = client.query(sqlStmt);
       query.on('row', function(row){
-        console.log(row.device_id + ' ' + row.gps_latitude + ' ' + row.gps_longitude);
+        console.log(row.uuid + ' ' + row.gps_latitude + ' ' + row.gps_longitude);
         rows.push(row);
       });
 
@@ -99,7 +99,7 @@ function insertLocation(loc){
     }
     else{
       var sqlStmt  = "INSERT INTO locations(";
-          sqlStmt += "device_id,";
+          sqlStmt += "uuid,";
           sqlStmt += "gps_timestamp,";
           sqlStmt += "gps_latitude,";
           sqlStmt += "gps_longitude,";
@@ -108,7 +108,7 @@ function insertLocation(loc){
           sqlStmt += "created_at)";
           sqlStmt += "VALUES ($1, $2, $3, $4, $5, $6, Now())";
 
-      var sqlParams = [loc.device_id, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading];
+      var sqlParams = [loc.uuid, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading];
 
       var query = client.query(sqlStmt, sqlParams, function(err, result){
         if(err){
