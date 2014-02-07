@@ -44,11 +44,15 @@ route.for("POST", "/location", function(request, response){
 
     for(var i=0; i < map_clients.length; i++){
       var client = map_clients[i];
-      console.log("Sending gps to viewer: " + client.user_id);
-      console.log("Devices: " + client.devices);
 
-      var jsonString = JSON.stringify({ type:'gps', data:obj});
-      client.send(jsonString);
+      if(isAllowed(client.devices, obj.uuid)){
+        console.log("Sending gps to viewer: " + client.user_id);
+        console.log("Devices: " + client.devices);
+
+        var jsonString = JSON.stringify({ type:'gps', data:obj});
+        client.send(jsonString);
+      }
+
     }
 
     response.writeHead(200, {"Content-Type": "text/plain"});
@@ -146,7 +150,7 @@ function setAllowedDevices(socket, user_id){
 
       query.on('row', function(row){
         console.log(row.uuid);
-        devices.push(row);
+        devices.push(row.uuid);
       });
 
       query.on('end', function(result){
@@ -155,6 +159,10 @@ function setAllowedDevices(socket, user_id){
       });
     }
   });
+}
+
+function isAllowed(devices_array, uuid){
+  return devices_array.indexOf(uuid) > -1;
 }
 
 var server = http.createServer(onRequest);
