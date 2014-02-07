@@ -44,6 +44,9 @@ route.for("POST", "/location", function(request, response){
 
     for(var i=0; i < map_clients.length; i++){
       var client = map_clients[i];
+      console.log("Sending gps to viewer: " + client.user_id);
+      console.log("Devices: " + client.devices);
+
       var jsonString = JSON.stringify({ type:'gps', data:obj});
       client.send(jsonString);
     }
@@ -128,6 +131,32 @@ function insertLocation(loc){
   });
 }
 
+function setAllowedDevices(socket, user_id){
+  var devices = [];
+
+  pg.connect(connectionString, function(err, client) {
+    if(err) {
+      console.error('error fetching client from pool ', err);
+    }
+    else{
+      var sqlStmt  = "SELECT * FROM devices WHERE user_id = " + user_id;
+
+      var query = client.query(sqlStmt);
+      console.log("Devices for user_id(" + user_id + "):");
+
+      query.on('row', function(row){
+        console.log(row.uuid);
+        devices.push(row);
+      });
+
+      query.on('end', function(result){
+        socket.devices = devices;
+        client.end();
+      });
+    }
+  });
+}
+
 var server = http.createServer(onRequest);
 server.listen(port);
 console.log("Server " + port + " has started.");
@@ -135,12 +164,16 @@ console.log("Server " + port + " has started.");
 io = io.listen(server);
 
 io.sockets.on("connection", function(client){
-
   // We push the map clients to an array.
   // If a gps is received from a device,
   // we broadcast the gps to all map clients.
-  console.log("Map client connected");
   map_clients.push(client);
+
+  client.on('setUserId',function(user_id){
+    console.log("Map client connected for user_id: " + user_id);
+    client.user_id = user_id;
+    setAllowedDevices(client, user_id);
+  });
 
   client.on('disconnect', function(){
     map_clients.splice(map_clients.indexOf(client), 1);
