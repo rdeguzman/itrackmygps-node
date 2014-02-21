@@ -45,12 +45,14 @@ route.for("POST", "/location", function(request, response){
     for(var i=0; i < map_clients.length; i++){
       var client = map_clients[i];
 
-      if(isAllowed(client.devices, obj.uuid)){
-        console.log("Sending gps to viewer: " + client.user_id);
-        console.log("Devices: " + client.devices);
+      if (typeof client.devices != "undefined") {
+        if(isAllowed(client.devices, obj.uuid)){
+          console.log("Sending gps to viewer: " + client.user_id);
+          console.log("Devices: " + client.devices);
 
-        var jsonString = JSON.stringify({ type:'gps', data:obj});
-        client.send(jsonString);
+          var jsonString = JSON.stringify({ type:'gps', data:obj});
+          client.send(jsonString);
+        }
       }
 
     }
