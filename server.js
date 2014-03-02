@@ -86,7 +86,10 @@ route.for("GET", "/devices", function(request, response){
       console.error('error fetching client from pool ', err);
     }
     else{
-      var sqlStmt  = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations GROUP BY uuid)";
+      var url_parts = url.parse(request.url, true);
+      var query = url_parts.query;
+
+      var sqlStmt = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations WHERE uuid IN (SELECT uuid FROM devices WHERE user_id = " + query.user_id + ") GROUP BY uuid)";
 
       var query = client.query(sqlStmt);
       query.on('row', function(row){
