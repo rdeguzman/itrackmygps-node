@@ -44,6 +44,8 @@ route.for("POST", "/location", function(request, response){
 
     for(var i=0; i < map_clients.length; i++){
       var client = map_clients[i];
+      console.log("client.user_id:" + client.user_id);
+      console.log("client.devices:" + client.devices);
 
       if (typeof client.devices != "undefined") {
         if(isAllowed(client.devices, obj.uuid)){
