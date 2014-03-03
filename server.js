@@ -126,7 +126,7 @@ io.sockets.on("connection", function(client){
   });
 
   client.on('addDevice',function(device_id){
-    console.log("Add device_id: ");
+    console.log("Add device_id: " + device_id);
 
     if (typeof client.devices == "undefined") {
       client.devices = [];
