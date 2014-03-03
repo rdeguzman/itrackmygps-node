@@ -22,13 +22,6 @@ var route = {
   }
 }
 
-route.for("GET", "/map", function(request, response){
-  fs.readFile('./map.html', function(error, data){
-    response.writeHead(200, {"Content-Type": "text/html"});
-    response.end(data, 'utf-8');
-  })
-});
-
 route.for("POST", "/location", function(request, response){
   var form_data = "";
   request.on('data', function(chunk){
