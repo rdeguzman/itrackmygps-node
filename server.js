@@ -71,37 +71,6 @@ function onRequest(request, response){
   }
 }
 
-route.for("GET", "/devices", function(request, response){
-  var rows = [];
-
-  pg.connect(connectionString, function(err, client) {
-    if(err) {
-      console.error('error fetching client from pool ', err);
-    }
-    else{
-      var url_parts = url.parse(request.url, true);
-      var query = url_parts.query;
-
-      var sqlStmt = "SELECT * FROM locations WHERE id IN (SELECT max(id) FROM locations WHERE uuid IN (SELECT uuid FROM devices WHERE user_id = " + query.user_id + ") GROUP BY uuid)";
-
-      var query = client.query(sqlStmt);
-      query.on('row', function(row){
-        console.log(row.uuid + ' ' + row.gps_latitude + ' ' + row.gps_longitude);
-        rows.push(row);
-      });
-
-      query.on('end', function(result){
-        client.end();
-
-        response.setHeader("Access-Control-Allow-Origin", "*");
-        response.writeHead(200, {"Content-Type": "text/json"});
-        response.end(JSON.stringify(rows), 'utf-8');
-      });
-    }
-  });
-});
-
-
 function insertLocation(loc){
   pg.connect(connectionString, function(err, client, done) {
     if(err) {
@@ -135,32 +104,6 @@ function insertLocation(loc){
   });
 }
 
-function setAllowedDevices(socket, user_id){
-  var devices = [];
-
-  pg.connect(connectionString, function(err, client) {
-    if(err) {
-      console.error('error fetching client from pool ', err);
-    }
-    else{
-      var sqlStmt  = "SELECT * FROM devices WHERE user_id = " + user_id;
-
-      var query = client.query(sqlStmt);
-      console.log("Devices for user_id(" + user_id + "):");
-
-      query.on('row', function(row){
-        console.log(row.uuid);
-        devices.push(row.uuid);
-      });
-
-      query.on('end', function(result){
-        socket.devices = devices;
-        client.end();
-      });
-    }
-  });
-}
-
 function isAllowed(devices_array, uuid){
   return devices_array.indexOf(uuid) > -1;
 }
@@ -180,8 +123,18 @@ io.sockets.on("connection", function(client){
   client.on('setUserId',function(user_id){
     console.log("Map client connected for user_id: " + user_id);
     client.user_id = user_id;
-    setAllowedDevices(client, user_id);
   });
+
+  client.on('addDevice',function(device_id){
+    console.log("Add device_id: ");
+
+    if (typeof client.devices == "undefined") {
+      client.devices = [];
+    }
+
+    client.devices.push(device_id);
+  });
+
 
   client.on('disconnect', function(){
     map_clients.splice(map_clients.indexOf(client), 1);
