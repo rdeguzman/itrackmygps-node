@@ -1,9 +1,9 @@
 <VirtualHost 173.255.249.114:80>
   ServerAdmin rupert@2rmobile.com
-  ServerName track.geocoding.io
-  ServerAlias track.geocoding.io
+  ServerName node.itrackmygps.com
+  ServerAlias node.itrackmygps.com
   
-  DocumentRoot /srv/nodejs/gpslogger-node
+  DocumentRoot /srv/nodejs/itrackmygps-node
 
   ProxyRequests Off
   ProxyPreserveHost On
@@ -20,11 +20,11 @@
   ProxyPass / http://173.255.249.114:8080/
   ProxyPassReverse / http://173.255.249.114:8080/
 
-  ErrorLog /var/log/apache2/track.error.log
+  ErrorLog /var/log/apache2/itrackmygps-node.error.log
   
   # Possible values include: debug, info, notice, warn, error, crit,
   # alert, emerg.
   LogLevel warn
   
-  CustomLog /var/log/apache2/track.access.log combined
+  CustomLog /var/log/apache2/itrackmygps-node.access.log combined
 </VirtualHost>
