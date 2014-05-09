@@ -77,6 +77,9 @@ function insertLocation(loc){
       console.error('error fetching client from pool ', err);
     }
     else{
+      if(typeof loc.provider == "undefined")
+        loc.provider = "";
+
       var sqlStmt  = "INSERT INTO locations(";
           sqlStmt += "uuid,";
           sqlStmt += "gps_timestamp,";
