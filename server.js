@@ -84,10 +84,11 @@ function insertLocation(loc){
           sqlStmt += "gps_longitude,";
           sqlStmt += "gps_speed,";
           sqlStmt += "gps_heading,";
+          sqlStmt += "provider,";
           sqlStmt += "created_at)";
-          sqlStmt += "VALUES ($1, $2, $3, $4, $5, $6, Now())";
+          sqlStmt += "VALUES ($1, $2, $3, $4, $5, $6, $7, Now())";
 
-      var sqlParams = [loc.uuid, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading];
+      var sqlParams = [loc.uuid, loc.gps_timestamp, loc.gps_latitude, loc.gps_longitude, loc.gps_speed, loc.gps_heading, loc.provider];
 
       var query = client.query(sqlStmt, sqlParams, function(err, result){
         if(err){
